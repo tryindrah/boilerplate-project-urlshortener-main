@@ -30,11 +30,19 @@ app.get('/', function(req, res) {
 // Your first API endpoint
 app.post('/api/shorturl', async function(req, res) {
   const url = req.body.url;
-
+  console.log(url)
+  const regex = /(http:\/\/|https:\/\/)/
+  if(!regex.test(url)){
+    return res.json({
+      error: "invalid url"
+    });
+  }
   try {
     const address = await checkUrl(url);
+    
+    
     const data = await Url.findOne({ original_url: address });
-
+    
     if (data) {
       res.json({
         original_url: data.original_url,
@@ -68,14 +76,11 @@ app.get('/api/shorturl/:short_url', async function(req, res) {
       res.redirect(data.original_url);
     } else {
       res.json({
-        error: "invalid short url"
+        error: "URL Not Found"
       });
     }
   } catch (err) {
     console.log(err);
-    res.json({
-      error: "an error occurred"
-    });
   }
 });
 
